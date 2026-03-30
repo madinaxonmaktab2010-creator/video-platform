@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Teacher Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: white;
+        }
+        .navbar {
+            background: rgba(0,0,0,0.5) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .profile-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 40px;
+        }
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #7c3aed;
+            margin: 0 auto 20px;
+            display: block;
+        }
+        .avatar-placeholder {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 20px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #a78bfa;
+        }
+        .stat-label {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.85rem;
+        }
+        .btn-purple {
+            background: #7c3aed;
+            border: none;
+            color: white;
+            border-radius: 20px;
+            padding: 8px 24px;
+        }
+        .btn-purple:hover { background: #6d28d9; color: white; }
+        .upload-area {
+            background: rgba(255,255,255,0.05);
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .video-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .section-title {
+            border-left: 4px solid #7c3aed;
+            padding-left: 10px;
+        }
+        a { color: #a78bfa; }
+    </style>
+</head>
+<body>
+<nav class="navbar px-4 py-3">
+    <a class="navbar-brand fw-bold text-white" href="/">🎬 AI & CS Platform</a>
+    <a href="/" class="btn btn-sm btn-outline-light">← Back to Home</a>
+</nav>
+
+<div class="container mt-5">
+    <div class="profile-card text-center mb-4">
+
+        {% if user.profile_pic and user.profile_pic != 'default.png' %}
+            <img src="/profile_pics/{{ user.profile_pic }}" class="avatar">
+        {% else %}
+            <div class="avatar-placeholder mx-auto">👨‍🏫</div>
+        {% endif %}
+
+        <h2 class="mb-1">{{ teacher.name }}</h2>
+        <p class="text-muted mb-2">Teacher</p>
+        <p class="mb-4" style="color:rgba(255,255,255,0.7);">{{ teacher.bio or 'No bio yet.' }}</p>
+
+        <!-- Upload Photo -->
+        <div class="upload-area mb-4">
+            <p class="text-muted mb-2">📷 Change Profile Photo</p>
+            <form method="POST" action="/upload_photo" enctype="multipart/form-data">
+                <input type="file" name="photo" accept="image/*" class="form-control mb-2" style="background:rgba(255,255,255,0.1); color:white; border:none;">
+                <button type="submit" class="btn btn-purple btn-sm">Upload Photo</button>
+            </form>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-success">{{ messages[0] }}</div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Only show video count -->
+        <div class="row g-3 mb-4 justify-content-center">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number">📹 {{ teacher.videos|length }}</div>
+                <div class="stat-label">Videos Uploaded</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number" style="font-size:1.2rem;">{{ teacher.subject or 'General' }}</div>
+                <div class="stat-label">Subject</div>
+            </div>
+        </div>
+
+        <a href="/edit_bio" class="btn btn-purple me-2">✏️ Edit Bio</a>
+        <a href="/upload" class="btn btn-outline-light">📤 Upload Video</a>
+    </div>
+    
+    <!-- Teacher's Videos -->
+    <h4 class="section-title mb-3">My Videos</h4>
+    <div class="row">
+        {% for video in teacher.videos %}
+        <div class="col-md-4 mb-3">
+            <div class="video-card">
+                <h6 class="text-white">{{ video.title }}</h6>
+                <p class="text-muted" style="font-size:0.85rem;">{{ video.description }}</p>
+                <span class="badge mb-2" style="background:#7c3aed; border-radius:10px;">{{ video.subject }}</span><br>
+                <a href="/video/{{ video.id }}" class="btn btn-purple btn-sm">▶️ Watch</a>
+                <a href="/edit_video/{{ video.id }}" class="btn btn-info btn-sm">✏️ Edit</a>
+                <a href="/delete_video/{{ video.id }}" class="btn btn-danger btn-sm"
+                    onclick="return confirm('Are you sure?')">🗑️ Delete</a>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-muted">No videos yet!</p>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>

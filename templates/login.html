@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            backdrop-filter: blur(10px);
+        }
+        h1 { color: white; font-weight: bold; }
+        label { color: rgba(255,255,255,0.7); }
+        .form-control {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+        }
+        .form-control:focus {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 0.2rem rgba(124,58,237,0.3);
+        }
+        .form-control::placeholder { color: rgba(255,255,255,0.4); }
+        .btn-purple {
+            background: #7c3aed;
+            border: none;
+            color: white;
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .btn-purple:hover { background: #6d28d9; color: white; }
+        a { color: #a78bfa; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1 class="mb-4 text-center">🔐 Login</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-danger">{{ messages[0] }}</div>
+        {% endif %}
+    {% endwith %}
+    <form method="POST">
+        <div class="mb-3">
+            <label>Username</label>
+            <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+        </div>
+        <div class="mb-3">
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+        </div>
+        <button type="submit" class="btn-purple mt-2">Login</button>
+    </form>
+    <p class="text-center mt-3">Don't have an account? <a href="/register">Register here</a></p>
+</div>
+</body>
+</html>

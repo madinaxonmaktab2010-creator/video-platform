@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI/CS Video Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: white;
+        }
+        .navbar {
+            background: rgba(0,0,0,0.5) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+            position: sticky;
+            top: 20px;
+        }
+        .sidebar-title {
+            font-weight: bold;
+            font-size: 1rem;
+            color: #a78bfa;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+        .subject-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .subject-btn:hover {
+            background: rgba(124,58,237,0.3);
+            border-color: #7c3aed;
+            color: white;
+        }
+        .sub-link {
+            display: block;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.8);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .sub-link:hover {
+            background: rgba(124,58,237,0.2);
+            color: white;
+        }
+        .video-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .video-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.3); }
+        .video-card video {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #000;
+        }
+        .card-body { padding: 12px; }
+        .card-title { font-size: 1rem; font-weight: bold; color: white; }
+        .card-text { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+        .search-bar {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 30px;
+            padding: 10px 20px;
+            backdrop-filter: blur(5px);
+        }
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            width: 80%;
+        }
+        .search-bar input::placeholder { color: rgba(255,255,255,0.5); }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-left: 4px solid #7c3aed;
+            padding-left: 10px;
+            margin-bottom: 20px;
+        }
+        .teacher-tag { color: #a78bfa; font-size: 0.8rem; }
+        .watch-btn {
+            background: #7c3aed;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            padding: 4px 14px;
+            color: white;
+        }
+        .watch-btn:hover { background: #6d28d9; color: white; }
+        a { color: #a78bfa; }
+    </style>
+</head>
+<body>
+<nav class="navbar px-4 py-3">
+    <a class="navbar-brand fw-bold text-white fs-4" href="/">🎬 AI & CS Platform</a>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        {% if current_user.is_authenticated %}
+            <span class="text-white me-2">👤 <b>{{ current_user.username }}</b> | ⭐ {{ current_user.score }} pts</span>
+            <a href="/leaderboard" class="btn btn-warning btn-sm">🏆 Leaderboard</a>
+            {% if current_user.is_teacher %}
+                <a href="/upload" class="btn btn-success btn-sm">📤 Upload</a>
+                <a href="/my_teacher_profile" class="btn btn-secondary btn-sm">👨‍🏫 My Profile</a>
+            {% else %}
+                <a href="/profile" class="btn btn-secondary btn-sm">👤 My Profile</a>
+            {% endif %}
+            <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+        {% else %}
+            <a href="/login" class="btn btn-primary btn-sm">Login</a>
+            <a href="/register" class="btn btn-success btn-sm">Register</a>
+            <a href="/leaderboard" class="btn btn-warning btn-sm">🏆 Leaderboard</a>
+        {% endif %}
+    </div>
+</nav>
+
+<div class="container-fluid mt-4 px-4">
+    <div class="row">
+
+        <!-- Sidebar -->
+        <div class="col-md-2">
+            <div class="sidebar">
+                <div class="sidebar-title">📚 Subjects</div>
+
+                <a href="/subject/Mathematics" class="subject-btn">📐 Mathematics</a>
+
+                <div>
+                    <button class="subject-btn" onclick="toggleSub('physics')">⚛️ Physics</button>
+                    <div id="physics" style="display:none; padding-left:10px; margin-bottom:5px;">
+                        <a href="/subject/Physics" class="sub-link">All Physics</a>
+                    </div>
+                </div>
+
+                <div>
+                    <button class="subject-btn" onclick="toggleSub('cs')">💻 Computer Science</button>
+                    <div id="cs" style="display:none; padding-left:10px; margin-bottom:5px;">
+                        <a href="/subject/Computer Science" class="sub-link">All CS Videos</a>
+                    </div>
+                </div>
+
+                <a href="/subject/General" class="subject-btn">📚 General</a>
+
+                <hr style="border-color:rgba(255,255,255,0.1);">
+                <a href="/leaderboard" class="subject-btn">🏆 Leaderboard</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10">
+            <!-- Search Bar -->
+            <div class="search-bar d-flex align-items-center mb-4 mx-auto" style="max-width:600px;">
+                <form action="/search" method="GET" class="w-100 d-flex">
+                    <input type="text" name="q" placeholder="🔍 Search videos, topics, teachers...">
+                    <button class="btn btn-sm watch-btn" type="submit">Search</button>
+                </form>
+            </div>
+
+            <!-- Videos Grid -->
+            <div class="section-title">🎥 All Videos</div>
+            <div class="row">
+                {% for video in videos %}
+                <div class="col-md-4 mb-4">
+                    <div class="video-card">
+                        <video controls preload="metadata">
+                            <source src="/uploads/{{ video.filename }}" type="video/mp4">
+                        </video>
+                        <div class="card-body" style="position:relative;">
+                            {% if current_user.is_authenticated and current_user.is_teacher %}
+                                {% set teacher = current_user %}
+                                <div style="position:absolute; top:10px; right:10px;">
+                                    <button onclick="toggleMenu({{ video.id }})" 
+                                        style="background:rgba(255,255,255,0.1); border:none; color:white; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:1rem;">⋮</button>
+                                    <div id="menu-{{ video.id }}" style="display:none; position:absolute; right:0; top:35px; background:#1e1b4b; border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:8px; z-index:100; min-width:150px;">
+                                        <a href="/edit_video/{{ video.id }}" style="display:block; color:white; text-decoration:none; padding:6px 10px; border-radius:6px;" onmouseover="this.style.background='rgba(124,58,237,0.3)'" onmouseout="this.style.background='transparent'">✏️ Edit Video</a>
+                                        <a href="/delete_video/{{ video.id }}" onclick="return confirm('Are you sure?')" style="display:block; color:#f87171; text-decoration:none; padding:6px 10px; border-radius:6px;" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='transparent'">🗑️ Delete Video</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <p class="card-title">{{ video.title }}</p>
+                            <p class="card-text">{{ video.description }}</p>
+                            <p class="teacher-tag">👨‍🏫 <a href="/teacher/{{ video.teacher.id }}" style="color:#a78bfa;">{{ video.teacher.name }}</a></p>
+                            <span class="badge" style="background:#7c3aed; border-radius:10px; font-size:0.75rem;">{{ video.subject }}</span>
+                            <br>
+                            {% if current_user.is_authenticated and not current_user.is_teacher %}
+                                {% set done = namespace(value=false) %}
+                                {% for t in current_user.test_results %}
+                                    {% if t.video_id == video.id %}
+                                        {% set done.value = true %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% if done.value %}
+                                    <span class="badge mb-1" style="background:rgba(34,197,94,0.3); border:1px solid #4ade80; border-radius:10px;">✅ Test Completed</span><br>
+                                {% endif %}
+                            {% endif %}
+                            <a href="/video/{{ video.id }}" class="btn watch-btn mt-2">▶️ Watch & Take Test</a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-muted">No videos yet!</p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function toggleMenu(id) {
+    const menu = document.getElementById('menu-' + id);
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleSub(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// Close menus when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('[onclick^="toggleMenu"]')) {
+        document.querySelectorAll('[id^="menu-"]').forEach(m => m.style.display = 'none');
+    }
+});
+</script>
+
+</body>
+</html>
